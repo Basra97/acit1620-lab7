@@ -10,6 +10,7 @@
  * displayed, allowing the player to reveal the answer.
  */
 import {
+    
     getCard,
     getCheckbox,
     getContinueBtn,
@@ -56,39 +57,36 @@ function setup() {
     getContinueBtn().addEventListener('click', activate);
     getCheckbox().addEventListener('change', toggleInputState);
     getNumberInput().addEventListener('input', (e) => {
-
-        const numTries = parseInt(e.target.value);
-    if (!isNaN(numTries) && numTries > 0) {
-        tries = numTries; // Update the tries based on user input
-        play(); // Restart the game
-    }
-        // 1. check user input, and if not provide, do nothing
-
-        // 2. Restart the game
-
+        if (getNumberInput().value >= 1 && getNumberInput().value <= 9) {
+            tries = getTries();
+        } else {
+            return;
+        }
+        play();
+        getOutput().querySelector('span:last-child').textContent = '';
     });
 
     for (let tile of getTiles()) {
         tile.addEventListener('click', (e) => {
             const outputNodes = getOutput().querySelectorAll('span');
 
-            outputNodes[0].innerHTML = `You clicked the <b>${tile.alt}</b>`;
+            outputNodes[0].innerHTML = `You selected the <b>${tile.alt}</b>.`;
 
-            if (tile.alt === getCard().alt) {
-                outputNodes[1].textContent = 'You win';
+            if (tile.alt === getCard()) {
+                outputNodes[1].textContent = 'You win!';
                 showResults();
             } else {
-                outputNodes[1].textContent = 'You lose';
+                outputNodes[1].textContent = 'Not quite!';
                 if (tries > 1) {
                     pause();
                 } else {
                     showResults();
                 }
             }
-        })
+
+        });
     }
 }
-
 function deactivate() {
     /**
      * Called after each guess
@@ -117,7 +115,8 @@ function activate() {
         tile.style.cursor = 'pointer';
     }
     getPanel().classList.toggle('dim', false);
-    getCheckbox().toggleAttribute('checked', false);
+    getNumberInput().toggleAttribute('disabled', true);
+    getCheckbox().checked = false;
     getContinueBtn().classList.toggle('hidden', true);
     getShowBtn().toggleAttribute('disabled', false);
 }
